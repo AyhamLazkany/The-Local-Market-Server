@@ -5,7 +5,21 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var userRouter = require('./routes/userRouter');
+var storeRouter = require('./routes/storeRouter');
+var productRouter = require('./routes/productRouter');
+
+var Products = require('./models/products');
+var Stores = require('./models/stores');
+var Users = require('./models/users');
+
+const mongoose = require('mongoose');
+const url = 'mongodb://localhost:27017/local-market';
+const connect = mongoose.connect(url);
+
+connect.then ((db) => {
+  console.log('Connected correctly to server');
+},(err) => console.log(err));
 
 var app = express();
 

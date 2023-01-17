@@ -1,0 +1,110 @@
+{
+   "users": [
+      {
+         "id": "a5d6b6d7",
+         "img": "assets/img/users/fox.jpg",
+         "username": "ayhamlaz",
+         "password": "153759852",
+         "firstname": "ayham",
+         "lastname": "lazkany",
+         "email": "ayhamlaz99@gmail.com",
+         "phone": "0969277247",
+         "seller": "true"
+      },
+      {
+         "id": "d7bad656",
+         "img": "assets/img/users/fox.jpg",
+         "username": "adellaz",
+         "password": "153759852",
+         "firstname": "adel",
+         "lastname": "lazkany",
+         "email": "adel.lazkany62@gmail.com",
+         "phone": "0944393880",
+         "seller": "false"
+      }
+   ],
+   "stores": [
+      {
+         "id": "a3474b5f",
+         "img": "assets/img/stores/store1.jpg",
+         "name": "store1",
+         "owner": "user.id",
+         "category": "Men's",
+         "title": ".....",
+         "description": "............................."
+      },
+      {
+         "id": "4a74fb53",
+         "img": "assets/img/stores/store2.jpg",
+         "name": "store2",
+         "owner": "user.id",
+         "category": "Women's",
+         "title": ".....",
+         "description": "............................."
+      }
+   ],
+   "products": [
+      {
+         "id": "a5f3779a",
+         "storeId": "",
+         "img": "",
+         "type": "",
+         "title": "",
+         "description": "",
+         "quantity": "",
+         "price": "",
+         "comments": [
+            {
+
+            },
+            {
+
+            },
+            {
+
+            }
+         ]
+      },
+      {
+         "id": "7d9578c4",
+         "storeId": "",
+         "img": "",
+         "type": "",
+         "title": "",
+         "description": "",
+         "quantity": "",
+         "price": "",
+         "comments": [
+            {
+               
+            },
+            {
+
+            },
+            {
+
+            }
+         ]
+      }
+   ],
+   "storeProducts": [
+      {
+         "storeId": "",
+         "products": ""
+      },
+      {
+         "storeId": "",
+         "products": ""
+      }
+   ],
+   "favorites": [
+      {
+         "user": "",
+         "products": ""
+      },
+      {
+         "user": "",
+         "products": ""
+      }
+   ]
+}
