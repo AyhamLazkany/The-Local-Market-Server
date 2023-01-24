@@ -1,7 +1,6 @@
 {
    "users": [
       {
-         "id": "a5d6b6d7",
          "img": "assets/img/users/fox.jpg",
          "username": "ayhamlaz",
          "password": "153759852",
@@ -12,7 +11,6 @@
          "seller": "true"
       },
       {
-         "id": "d7bad656",
          "img": "assets/img/users/fox.jpg",
          "username": "adellaz",
          "password": "153759852",
@@ -25,7 +23,6 @@
    ],
    "stores": [
       {
-         "id": "a3474b5f",
          "img": "assets/img/stores/store1.jpg",
          "name": "store1",
          "owner": "user.id",
@@ -34,7 +31,6 @@
          "description": "............................."
       },
       {
-         "id": "4a74fb53",
          "img": "assets/img/stores/store2.jpg",
          "name": "store2",
          "owner": "user.id",
@@ -45,56 +41,32 @@
    ],
    "products": [
       {
-         "id": "a5f3779a",
-         "storeId": "",
-         "img": "",
-         "type": "",
-         "title": "",
-         "description": "",
-         "quantity": "",
-         "price": "",
+         "storeId": "63c95beb416231d7d17036d3",
+         "img": "assets/img/stores/product1.jpg",
+         "category": "T-shirt",
+         "title": "new",
+         "description": ".........",
+         "quantity": "3",
+         "sizes": ["md","xl"],
+         "price": 70000,
          "comments": [
             {
-
-            },
-            {
-
-            },
-            {
-
+               "author": "",
+               "comment": "",
+               "rat": 1
             }
          ]
       },
       {
-         "id": "7d9578c4",
-         "storeId": "",
-         "img": "",
-         "type": "",
-         "title": "",
-         "description": "",
-         "quantity": "",
-         "price": "",
-         "comments": [
-            {
-               
-            },
-            {
-
-            },
-            {
-
-            }
-         ]
-      }
-   ],
-   "storeProducts": [
-      {
-         "storeId": "",
-         "products": ""
-      },
-      {
-         "storeId": "",
-         "products": ""
+         "storeId": "63c95beb416231d7d17036d3",
+         "img": "assets/img/stores/product1.jpg",
+         "category": "pants",
+         "title": "dirty",
+         "description": ".........",
+         "quantity": "4",
+         "sizes": ["lg","xl"],
+         "price": "78000",
+         "comments": []
       }
    ],
    "favorites": [

@@ -11,8 +11,8 @@ const storeSchema = new Schema({
       required: true
    },
    owner: {
-      type: String,
-      required: true
+      type: Schema.Types.ObjectId,
+      ref: 'user'
    },
    category: {
       type: String,
@@ -26,7 +26,7 @@ const storeSchema = new Schema({
       type: String,
       required: true
    }
-},{
+}, {
    timestamps: true
 });
 

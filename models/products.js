@@ -7,8 +7,7 @@ const commentSchema = new Schema({
       required: true
    },
    comment: {
-      type: String,
-      required: true
+      type: String
    },
    rat: {
       type: Number,
@@ -25,34 +24,37 @@ const productSchema = new Schema({
       type: String,
       required: true
    },
-   img:{ 
+   img: {
       type: String,
       required: true
    },
-   category:{ 
+   category: {
       type: String,
       required: true
    },
-   title:{ 
+   title: {
       type: String,
       required: true
    },
-   description:{ 
+   description: {
       type: String,
       required: true
    },
-   quantity:{ 
+   quantity: {
       type: Number,
       required: true
    },
-   price:{ 
+   sizes: {
+      type: [String],
+      required: true
+   },
+   price: {
       type: Number,
       required: true,
       min: 0
    },
    comments: {
-      type: [commentSchema],
-      required: true
+      type: [commentSchema]
    }
 }, {
    timestamps: true

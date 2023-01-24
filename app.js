@@ -4,24 +4,26 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var app = express();
+var config = require('./config');
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/userRouter');
 var storeRouter = require('./routes/storeRouter');
 var productRouter = require('./routes/productRouter');
+var favoriteRouter = require('./routes/favoriteRouter');
 
 var Products = require('./models/products');
+var Favorites = require('./models/favorites')
 var Stores = require('./models/stores');
 var Users = require('./models/users');
 
 const mongoose = require('mongoose');
-const url = 'mongodb://localhost:27017/local-market';
-const connect = mongoose.connect(url);
+const connect = mongoose.connect(config.mongoUrl);
 
 connect.then ((db) => {
   console.log('Connected correctly to server');
 },(err) => console.log(err));
 
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,7 +36,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users', userRouter);
+app.use('/stores', storeRouter);
+app.use('/products', productRouter);
+app.use('/favorites', favoriteRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
