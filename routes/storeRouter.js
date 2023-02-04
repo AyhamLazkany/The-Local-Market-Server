@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var Stores = require('../models/stores');
 var Products = require('../models/products');
+var authenticate = require('../authenticate');
 
 const storeRouter = express.Router();
 storeRouter.use(bodyParser.json());
@@ -9,7 +10,7 @@ storeRouter.use(bodyParser.json());
 /* GET stores listing. */
 storeRouter.route('/')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Stores.find({})
       .then((stores) => {
         res.statusCode = 200;
@@ -17,7 +18,7 @@ storeRouter.route('/')
         res.json(stores);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).post((req, res, next) => {
+  }).post(authenticate.verifyUser, (req, res, next) => {
     Stores.create(req.body)
       .then((store) => {
         res.statusCode = 200;
@@ -25,7 +26,7 @@ storeRouter.route('/')
         res.json(store);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).put((req, res, next) => {
+  }).put(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 404;
     res.end('Put operation is not supported on \'/stores\'');
   });
@@ -43,7 +44,7 @@ storeRouter.route('/')
 
 storeRouter.route('/:storeId')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Stores.findById(req.params.storeId)
       .then((store) => {
         res.statusCode = 200;
@@ -54,7 +55,7 @@ storeRouter.route('/:storeId')
   }).post((req, res, next) => {
     res.statusCode = 404;
     res.end('Post operation is not supported on \'/stores/' + req.params.storeId + '\'');
-  }).put((req, res, next) => {
+  }).put(authenticate.verifyUser, (req, res, next) => {
     Stores.findByIdAndUpdate(req.params.storeId, { $set: req.body }, { new: true })
       .then((store) => {
         res.statusCode = 200;
@@ -62,7 +63,7 @@ storeRouter.route('/:storeId')
         res.json(store);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).delete((req, res, next) => {
+  }).delete(authenticate.verifyUser, (req, res, next) => {
     Stores.findByIdAndRemove(req.params.storeId)
       .then((store) => {
         Products.deleteMany({ storeId: store._id })

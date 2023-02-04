@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var Products = require('../models/products');
+var authenticate = require('../authenticate');
 
 const productRouter = express.Router();
 productRouter.use(bodyParser.json());
@@ -8,7 +9,7 @@ productRouter.use(bodyParser.json());
 /* GET products listing. */
 productRouter.route('/')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Products.find({ storeId: req.body.storeId })
       .then((products) => {
         res.statusCode = 200;
@@ -16,7 +17,7 @@ productRouter.route('/')
         res.json(products);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).post((req, res, next) => {
+  }).post(authenticate.verifyUser, (req, res, next) => {
     Products.create(req.body)
       .then((product) => {
         res.statusCode = 200;
@@ -27,7 +28,7 @@ productRouter.route('/')
   }).put((req, res, next) => {
     res.statusCode = 404;
     res.end('Put operation is not supported on \'/products\'');
-  }).delete((req, res, next) => {
+  }).delete(authenticate.verifyUser, (req, res, next) => {
     Products.deleteMany({ storeId: req.body.storeId })
       .then((delResult) => {
         res.statusCode = 200;
@@ -39,7 +40,7 @@ productRouter.route('/')
 
 productRouter.route('/:productId')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         res.statusCode = 200;
@@ -50,7 +51,7 @@ productRouter.route('/:productId')
   }).post((req, res, next) => {
     res.statusCode = 404;
     res.end('Post operation is not supported on \'/products/' + req.params.productId + '\'');
-  }).put((req, res, next) => {
+  }).put(authenticate.verifyUser, (req, res, next) => {
     Products.findByIdAndUpdate(req.params.productId, { $set: req.body }, { new: true })
       .then((product) => {
         res.statusCode = 200;
@@ -58,7 +59,7 @@ productRouter.route('/:productId')
         res.json(product);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).delete((req, res, next) => {
+  }).delete(authenticate.verifyUser, (req, res, next) => {
     Products.findByIdAndRemove(req.params.productId)
       .then((product) => {
         res.statusCode = 200;
@@ -70,7 +71,7 @@ productRouter.route('/:productId')
 
 productRouter.route('/:productId/comments')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null) {
@@ -84,7 +85,7 @@ productRouter.route('/:productId/comments')
         }
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).post((req, res, next) => {
+  }).post(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null) {
@@ -103,7 +104,7 @@ productRouter.route('/:productId/comments')
   }).put((req, res, next) => {
     res.statusCode = 404;
     res.end('Put operation is not supported on \'/products/' + req.params.productId + '\/comments\'');
-  }).delete((req, res, next) => {
+  }).delete(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null) {
@@ -124,7 +125,7 @@ productRouter.route('/:productId/comments')
 
 productRouter.route('/:productId/comments/:commentId')
   .options((req, res) => { res.sendStatus(200); })
-  .get((req, res, next) => {
+  .get(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null && product.comments.id(req.params.commentId) != null) {
@@ -146,7 +147,7 @@ productRouter.route('/:productId/comments/:commentId')
     res.statusCode = 404;
     res.end('Post operation is not supported on \'/products/'
       + req.params.productId + '\/comments/' + req.params.commentId + '\'');
-  }).put((req, res, next) => {
+  }).put(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null && product.comments.id(req.params.commentId) != null) {
@@ -170,7 +171,7 @@ productRouter.route('/:productId/comments/:commentId')
           return err;
         }
       }, (err) => next(err))
-  }).delete((req, res, next) => {
+  }).delete(authenticate.verifyUser, (req, res, next) => {
     Products.findById(req.params.productId)
       .then((product) => {
         if (product != null && product.comments.id(req.params.commentId) != null) {

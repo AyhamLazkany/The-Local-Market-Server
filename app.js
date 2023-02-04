@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var passport = require('passport');
 
 var app = express();
 var config = require('./config');
@@ -11,11 +12,8 @@ var userRouter = require('./routes/userRouter');
 var storeRouter = require('./routes/storeRouter');
 var productRouter = require('./routes/productRouter');
 var favoriteRouter = require('./routes/favoriteRouter');
-
-var Products = require('./models/products');
-var Favorites = require('./models/favorites')
-var Stores = require('./models/stores');
-var Users = require('./models/users');
+var bayRecRouter = require('./routes/bayRecRouter');
+var saleRecRouter = require('./routes/saleRecRouter');
 
 const mongoose = require('mongoose');
 const connect = mongoose.connect(config.mongoUrl);
@@ -34,12 +32,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+
 
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 app.use('/stores', storeRouter);
 app.use('/products', productRouter);
 app.use('/favorites', favoriteRouter);
+app.use('/bayRecs', bayRecRouter);
+app.use('/saleRecs', saleRecRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

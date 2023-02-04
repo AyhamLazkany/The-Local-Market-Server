@@ -8,7 +8,7 @@ const saleRecRouter = express.Router();
 saleRecRouter.use(bodyParser.json());
 
 saleRecRouter.route('/')
-   .get((req, res, next) => {
+   .get(authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .populate('products')
          .then((SaleRecs) => {
@@ -29,7 +29,7 @@ saleRecRouter.route('/')
    }).put((req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/SaleRecs\'');
-   }).delete((req, res, next) => {
+   }).delete(authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOneAndDelete({ user: req.user._id })
          .then((saleRec) => {
             res.statusCode = 200;
@@ -40,7 +40,7 @@ saleRecRouter.route('/')
    });
 
 saleRecRouter.route('/:productId')
-   .get((req, res, next) => {
+   .get(authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             if (saleRec && saleRec.products.indexOf(req.params.productId) !== -1) {
@@ -61,7 +61,7 @@ saleRecRouter.route('/:productId')
             }
          }, (err) => next(err))
          .catch((err) => next(err));
-   }).post((req, res, next) => {
+   }).post(authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             if (saleRec && saleRec.products.indexOf(req.params.productId) == -1) {
@@ -96,7 +96,7 @@ saleRecRouter.route('/:productId')
    }).put((req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/SaleRecs\'');
-   }).delete((req, res, next) => {
+   }).delete(authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             saleRec.products.remove(req.params.productId);

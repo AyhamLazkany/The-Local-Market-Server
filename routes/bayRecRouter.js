@@ -8,7 +8,7 @@ const bayRecRouter = express.Router();
 bayRecRouter.use(bodyParser.json());
 
 bayRecRouter.route('/')
-   .get((req, res, next) => {
+   .get(authenticate.verifyUser, (req, res, next) => {
       BayRecs.findOne({ user: req.user._id })
          .populate('products')
          .then((BayRecs) => {
@@ -29,7 +29,7 @@ bayRecRouter.route('/')
    }).put((req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/BayRecs\'');
-   }).delete((req, res, next) => {
+   }).delete(authenticate.verifyUser, (req, res, next) => {
       BayRecs.findOneAndDelete({ user: req.user._id })
          .then((bayRec) => {
             res.statusCode = 200;
@@ -40,7 +40,7 @@ bayRecRouter.route('/')
    });
 
 bayRecRouter.route('/:productId')
-   .get((req, res, next) => {
+   .get(authenticate.verifyUser, (req, res, next) => {
       BayRecs.findOne({ user: req.user._id })
          .then((bayRec) => {
             if (bayRec && bayRec.products.indexOf(req.params.productId) !== -1) {
@@ -61,7 +61,7 @@ bayRecRouter.route('/:productId')
             }
          }, (err) => next(err))
          .catch((err) => next(err));
-   }).post((req, res, next) => {
+   }).post(authenticate.verifyUser, (req, res, next) => {
       BayRecs.findOne({ user: req.user._id })
          .then((bayRec) => {
             if (bayRec && bayRec.products.indexOf(req.params.productId) == -1) {
@@ -96,7 +96,7 @@ bayRecRouter.route('/:productId')
    }).put((req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/BayRecs\'');
-   }).delete((req, res, next) => {
+   }).delete(authenticate.verifyUser, (req, res, next) => {
       BayRecs.findOne({ user: req.user._id })
          .then((bayRec) => {
             bayRec.products.remove(req.params.productId);
