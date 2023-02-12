@@ -18,10 +18,14 @@ var saleRecRouter = require('./routes/saleRecRouter');
 const mongoose = require('mongoose');
 const connect = mongoose.connect(config.mongoUrl);
 
-connect.then ((db) => {
+connect.then((db) => {
   console.log('Connected correctly to server');
-},(err) => console.log(err));
+}, (err) => console.log(err));
 
+app.all('*', (req, res, next) => {
+  if (req.secure) return next();
+  else res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,12 +48,12 @@ app.use('/bayRecs', bayRecRouter);
 app.use('/saleRecs', saleRecRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

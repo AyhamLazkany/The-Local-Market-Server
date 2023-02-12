@@ -2,20 +2,22 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var SaleRecs = require('../models/saleRecs');
 var authenticate = require('../authenticate');
+var cors = require('./cors');
 
 const saleRecRouter = express.Router();
 
 saleRecRouter.use(bodyParser.json());
 
 saleRecRouter.route('/')
-   .get(authenticate.verifyUser, (req, res, next) => {
+   .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
+   .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .populate('products')
          .then((SaleRecs) => {
             if (SaleRecs) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
-               res.json({status: 'Fetching SaleRecs Successful', SaleRecs: SaleRecs.products});
+               res.json({ status: 'Fetching SaleRecs Successful', SaleRecs: SaleRecs.products });
             } else {
                var err = new Error('Not Found : You don\'t have a saleRec products');
                err.status = 404;
@@ -23,13 +25,13 @@ saleRecRouter.route('/')
             }
          }, (err) => next(err))
          .catch((err) => next(err));
-   }).post((req, res, next) => {
+   }).post(cors.corsWithOptions, (req, res, next) => {
       res.statusCode = 404;
       res.end('Post operation is not supported on \'/SaleRecs\'');
-   }).put((req, res, next) => {
+   }).put(cors.corsWithOptions, (req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/SaleRecs\'');
-   }).delete(authenticate.verifyUser, (req, res, next) => {
+   }).delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOneAndDelete({ user: req.user._id })
          .then((saleRec) => {
             res.statusCode = 200;
@@ -40,7 +42,8 @@ saleRecRouter.route('/')
    });
 
 saleRecRouter.route('/:productId')
-   .get(authenticate.verifyUser, (req, res, next) => {
+   .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
+   .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             if (saleRec && saleRec.products.indexOf(req.params.productId) !== -1) {
@@ -48,7 +51,7 @@ saleRecRouter.route('/:productId')
                   .then((saleRec) => {
                      res.statusCode = 200;
                      res.setHeader('Content-type', 'application/json');
-                     res.json({status: 'Fetching saleRec Successful', saleRec: saleRec.products.find(product => product._id = req.params.productId)});
+                     res.json({ status: 'Fetching saleRec Successful', saleRec: saleRec.products.find(product => product._id = req.params.productId) });
                   }, (err) => next(err));
             } else if (saleRec.products.indexOf(req.params.productId) == -1) {
                err = new Error('The product with id \'' + req.params.productId + '\' not found');
@@ -61,7 +64,7 @@ saleRecRouter.route('/:productId')
             }
          }, (err) => next(err))
          .catch((err) => next(err));
-   }).post(authenticate.verifyUser, (req, res, next) => {
+   }).post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             if (saleRec && saleRec.products.indexOf(req.params.productId) == -1) {
@@ -72,7 +75,7 @@ saleRecRouter.route('/:productId')
                         .then((saleRec) => {
                            res.statusCode = 200;
                            res.setHeader('Content-type', 'application/json');
-                           res.json({status: 'Adding saleRec Successful', saleRec: saleRec.products});
+                           res.json({ status: 'Adding saleRec Successful', saleRec: saleRec.products });
                         }, (err) => next(err))
                   }, (err) => next(err));
             } else if (!saleRec) {
@@ -82,7 +85,7 @@ saleRecRouter.route('/:productId')
                         .then((saleRec) => {
                            res.statusCode = 200;
                            res.setHeader('Content-type', 'application/json');
-                           res.json({status: 'Adding saleRec Successful', saleRec: saleRec.products});
+                           res.json({ status: 'Adding saleRec Successful', saleRec: saleRec.products });
                         }, (err) => next(err));
                   }, (err) => next(err))
                   .catch((err) => next(err))
@@ -93,10 +96,10 @@ saleRecRouter.route('/:productId')
             }
          }, (err) => next(err))
          .catch((err) => next(err))
-   }).put((req, res, next) => {
+   }).put(cors.corsWithOptions, (req, res, next) => {
       res.statusCode = 404;
       res.end('Put operation is not supported on \'/SaleRecs\'');
-   }).delete(authenticate.verifyUser, (req, res, next) => {
+   }).delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
          .then((saleRec) => {
             saleRec.products.remove(req.params.productId);

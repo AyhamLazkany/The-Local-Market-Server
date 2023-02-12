@@ -3,14 +3,15 @@ var bodyParser = require('body-parser');
 var Stores = require('../models/stores');
 var Products = require('../models/products');
 var authenticate = require('../authenticate');
+var cors = require('./cors');
 
 const storeRouter = express.Router();
 storeRouter.use(bodyParser.json());
 
 /* GET stores listing. */
 storeRouter.route('/')
-  .options((req, res) => { res.sendStatus(200); })
-  .get(authenticate.verifyUser, (req, res, next) => {
+  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
+  .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
     Stores.find({})
       .then((stores) => {
         res.statusCode = 200;
@@ -18,7 +19,7 @@ storeRouter.route('/')
         res.json(stores);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).post(authenticate.verifyUser, (req, res, next) => {
+  }).post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Stores.create(req.body)
       .then((store) => {
         res.statusCode = 200;
@@ -26,7 +27,7 @@ storeRouter.route('/')
         res.json(store);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).put(authenticate.verifyUser, (req, res, next) => {
+  }).put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 404;
     res.end('Put operation is not supported on \'/stores\'');
   });
@@ -43,8 +44,8 @@ storeRouter.route('/')
 */
 
 storeRouter.route('/:storeId')
-  .options((req, res) => { res.sendStatus(200); })
-  .get(authenticate.verifyUser, (req, res, next) => {
+  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
+  .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
     Stores.findById(req.params.storeId)
       .then((store) => {
         res.statusCode = 200;
@@ -52,10 +53,10 @@ storeRouter.route('/:storeId')
         res.json(store);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).post((req, res, next) => {
+  }).post(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 404;
     res.end('Post operation is not supported on \'/stores/' + req.params.storeId + '\'');
-  }).put(authenticate.verifyUser, (req, res, next) => {
+  }).put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Stores.findByIdAndUpdate(req.params.storeId, { $set: req.body }, { new: true })
       .then((store) => {
         res.statusCode = 200;
@@ -63,15 +64,15 @@ storeRouter.route('/:storeId')
         res.json(store);
       }, (err) => next(err))
       .catch((err) => next(err));
-  }).delete(authenticate.verifyUser, (req, res, next) => {
+  }).delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Stores.findByIdAndRemove(req.params.storeId)
       .then((store) => {
         Products.deleteMany({ storeId: store._id })
-        .then((delResult) => {
-          res.statusCode = 200;
-          res.setHeader('Content-type', 'application/json');
-          res.json(store);
-        }, (err) => next(err))
+          .then((delResult) => {
+            res.statusCode = 200;
+            res.setHeader('Content-type', 'application/json');
+            res.json(store);
+          }, (err) => next(err))
       }, (err) => next(err))
       .catch((err) => next(err));
   });
