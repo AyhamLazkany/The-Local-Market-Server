@@ -22,8 +22,8 @@ app.set('secPort', port + 443);
  * Create HTTP & HTTPS servers.
  */
 var options = {
-  key: fs.readFileSync(__dirname + '/private.key'),
-  cert: fs.readFileSync(__dirname + '/certificate.pem')
+  key: fs.readFileSync(__dirname + '/CA/localhost/localhost.decrypted.key'),
+  cert: fs.readFileSync(__dirname + '/CA/localhost/localhost.crt')
 };
 
 var server = http.createServer(app);

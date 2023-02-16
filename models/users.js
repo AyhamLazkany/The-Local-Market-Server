@@ -7,14 +7,6 @@ const userSchema = new Schema({
       type: String,
       default: 'assest/img/users/fox.jpg'
    },
-   firstname: {
-      type: String,
-      default: ''
-   },
-   lastname: {
-      type: String,
-      default: ''
-   },
    email: {
       type: String,
       default: '',

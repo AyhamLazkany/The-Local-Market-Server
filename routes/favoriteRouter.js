@@ -14,14 +14,20 @@ favoriteRouter.route('/')
       Favorites.findOne({ user: req.user._id })
          .populate('products')
          .then((favorites) => {
-            if (favorites) {
+            if (!favorites) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
-               res.json({ status: 'Fetching Favorites Successful', favorites: favorites.products });
+               res.json({ "exists": false });
             } else {
-               var err = new Error('Not Found : You don\'t have a favorite products');
-               err.status = 404;
-               return next(err);
+               if (favorites.products == []) {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": false, "favorites": favorites.products });
+               } else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": true, "favorites": favorites.products });
+               }
             }
          }, (err) => next(err))
          .catch((err) => next(err));
@@ -54,13 +60,13 @@ favoriteRouter.route('/:productId')
                      res.json({ status: 'Fetching Favorite Successful', favorite: favorite.products.find(product => product._id = req.params.productId) });
                   }, (err) => next(err));
             } else if (favorite.products.indexOf(req.params.productId) == -1) {
-               err = new Error('The product with id \'' + req.params.productId + '\' not found');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false, "favorite": favorite.products });
             } else {
-               var err = new Error('Not Found : You don\'t have a favorite product');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false });
             }
          }, (err) => next(err))
          .catch((err) => next(err));

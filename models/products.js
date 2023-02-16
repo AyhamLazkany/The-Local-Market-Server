@@ -6,6 +6,10 @@ const commentSchema = new Schema({
       type: String,
       required: true
    },
+   authorId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+   },
    comment: {
       type: String
    },
@@ -20,9 +24,13 @@ const commentSchema = new Schema({
 });
 
 const productSchema = new Schema({
-   storeId: {
+   store: {
       type: String,
       required: true
+   },
+   storeId: {
+      type: Schema.Types.ObjectId,
+      ref: 'store'
    },
    img: {
       type: String,

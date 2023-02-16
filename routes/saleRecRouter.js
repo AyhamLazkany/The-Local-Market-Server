@@ -14,14 +14,20 @@ saleRecRouter.route('/')
       SaleRecs.findOne({ user: req.user._id })
          .populate('products')
          .then((SaleRecs) => {
-            if (SaleRecs) {
+            if (!SaleRecs) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
-               res.json({ status: 'Fetching SaleRecs Successful', SaleRecs: SaleRecs.products });
+               res.json({ "exists": false });
             } else {
-               var err = new Error('Not Found : You don\'t have a saleRec products');
-               err.status = 404;
-               return next(err);
+               if (SaleRecs.products == []) {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": false, "SaleRecs": SaleRecs });
+               } else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": true, "SaleRecs": SaleRecs.products });
+               }
             }
          }, (err) => next(err))
          .catch((err) => next(err));
@@ -54,13 +60,13 @@ saleRecRouter.route('/:productId')
                      res.json({ status: 'Fetching saleRec Successful', saleRec: saleRec.products.find(product => product._id = req.params.productId) });
                   }, (err) => next(err));
             } else if (saleRec.products.indexOf(req.params.productId) == -1) {
-               err = new Error('The product with id \'' + req.params.productId + '\' not found');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false, "saleRec": saleRec.products });
             } else {
-               var err = new Error('Not Found : You don\'t have a saleRec product');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false });
             }
          }, (err) => next(err))
          .catch((err) => next(err));

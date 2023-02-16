@@ -47,7 +47,10 @@
          "title": "new",
          "description": ".........",
          "quantity": "3",
-         "sizes": ["md","xl"],
+         "sizes": [
+            "md",
+            "xl"
+         ],
          "price": 70000,
          "comments": [
             {
@@ -55,7 +58,9 @@
                "comment": "",
                "rat": 1
             }
-         ]
+         ],
+         "createdAt": "2023-01-24T13:28:23.417Z",
+         "updatedAt": "2023-01-25T18:01:44.756Z"
       },
       {
          "storeId": "63c95beb416231d7d17036d3",
@@ -64,7 +69,10 @@
          "title": "dirty",
          "description": ".........",
          "quantity": "4",
-         "sizes": ["lg","xl"],
+         "sizes": [
+            "lg",
+            "xl"
+         ],
          "price": "78000",
          "comments": []
       }

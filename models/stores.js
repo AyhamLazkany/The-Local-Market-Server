@@ -11,6 +11,10 @@ const storeSchema = new Schema({
       required: true
    },
    owner: {
+      type: String,
+      required: true
+   },
+   ownerId: {
       type: Schema.Types.ObjectId,
       ref: 'user'
    },
