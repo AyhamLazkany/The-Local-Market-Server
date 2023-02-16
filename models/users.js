@@ -5,15 +5,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const userSchema = new Schema({
    img: {
       type: String,
-      default: 'assest/img/users/fox.jpg'
-   },
-   firstname: {
-      type: String,
-      default: ''
-   },
-   lastname: {
-      type: String,
-      default: ''
+      default: 'assets/img/users/fox.jpg'
    },
    email: {
       type: String,

@@ -11,7 +11,7 @@ productRouter.use(bodyParser.json());
 productRouter.route('/')
   .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
   .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
-    Products.find({ storeId: req.body.storeId })
+    Products.find(req.query)
       .then((products) => {
         res.statusCode = 200;
         res.setHeader('Content-type', 'application/json');
@@ -30,7 +30,7 @@ productRouter.route('/')
     res.statusCode = 404;
     res.end('Put operation is not supported on \'/products\'');
   }).delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Products.deleteMany({ storeId: req.body.storeId })
+    Products.deleteMany(req.query)
       .then((delResult) => {
         res.statusCode = 200;
         res.setHeader('Content-type', 'application/json');

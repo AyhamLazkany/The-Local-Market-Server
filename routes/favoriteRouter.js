@@ -14,14 +14,20 @@ favoriteRouter.route('/')
       Favorites.findOne({ user: req.user._id })
          .populate('products')
          .then((favorites) => {
-            if (favorites) {
+            if (!favorites) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
-               res.json({ status: 'Fetching Favorites Successful', favorites: favorites.products });
+               res.json({ "exists": false });
             } else {
-               var err = new Error('Not Found : You don\'t have a favorite products');
-               err.status = 404;
-               return next(err);
+               if (favorites.products == []) {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": false });
+               } else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": true, "favorites": favorites.products });
+               }
             }
          }, (err) => next(err))
          .catch((err) => next(err));
@@ -47,20 +53,13 @@ favoriteRouter.route('/:productId')
       Favorites.findOne({ user: req.user._id })
          .then((favorite) => {
             if (favorite && favorite.products.indexOf(req.params.productId) !== -1) {
-               favorite.populate('products')
-                  .then((favorite) => {
-                     res.statusCode = 200;
-                     res.setHeader('Content-type', 'application/json');
-                     res.json({ status: 'Fetching Favorite Successful', favorite: favorite.products.find(product => product._id = req.params.productId) });
-                  }, (err) => next(err));
-            } else if (favorite.products.indexOf(req.params.productId) == -1) {
-               err = new Error('The product with id \'' + req.params.productId + '\' not found');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-type', 'application/json');
+               res.json({ exists: true });
             } else {
-               var err = new Error('Not Found : You don\'t have a favorite product');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ exists: false });
             }
          }, (err) => next(err))
          .catch((err) => next(err));
@@ -71,12 +70,9 @@ favoriteRouter.route('/:productId')
                favorite.products.push(req.params.productId);
                favorite.save()
                   .then((favorite) => {
-                     favorite.populate('products')
-                        .then((favorite) => {
-                           res.statusCode = 200;
-                           res.setHeader('Content-type', 'application/json');
-                           res.json({ status: 'Adding Favorite Successful', favorite: favorite.products });
-                        }, (err) => next(err))
+                     res.statusCode = 200;
+                     res.setHeader('Content-type', 'application/json');
+                     res.json({ success: true, status: 'Adding Favorite Successful' });
                   }, (err) => next(err));
             } else if (!favorite) {
                Favorites.create({ user: req.user._id, products: req.params.productId })
@@ -85,14 +81,14 @@ favoriteRouter.route('/:productId')
                         .then((favorite) => {
                            res.statusCode = 200;
                            res.setHeader('Content-type', 'application/json');
-                           res.json(favorite.products);
+                           res.json({ success: true, status: 'Adding Favorite Successful' });
                         }, (err) => next(err));
                   }, (err) => next(err))
                   .catch((err) => next(err))
             } else {
-               var err = new Error('This product is already in the favorite list');
-               err.statusCode = 500;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-type', 'application/json');
+               res.json({ success: false, status: 'Favorite already exists' });
             }
          }, (err) => next(err))
          .catch((err) => next(err))
@@ -109,7 +105,7 @@ favoriteRouter.route('/:productId')
                      .then((favorite) => {
                         res.statusCode = 200;
                         res.setHeader('Content-Type', 'application/json');
-                        res.json(favorite);
+                        res.json({ success: true, status: 'Deleting favorite success' });
                      }, (err) => next(err))
                }, (err) => next(err))
          }, (err) => next(err))

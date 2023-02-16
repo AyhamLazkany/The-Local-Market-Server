@@ -9,93 +9,137 @@ const userRouter = express.Router();
 userRouter.use(bodyParser.json());
 
 /* GET users listing. */
+userRouter.options('*', cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+
 userRouter.route('/')
-  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
-  .get(authenticate.verifyUser, (req, res, next) => {
-    Users.find({})
+  .get(cors.corsWithOptions, (req, res, next) => {
+    Users.findOne(req.query)
       .then((users) => {
-        res.statusCode = 200;
-        res.setHeader('Content-type', 'application/json');
-        res.json({ status: 'Fetching all users Successful', users: users });
+        if (users) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({ success: false, status: '' });
+        } else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({ success: true, status: '' });
+        }
       }, (err) => next(err))
       .catch((err) => next(err));
   });
 
-userRouter.route('/signup')
-  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
-  .post((req, res, next) => {
-    Users.register(new Users({ username: req.body.username }), req.body.password,
-      (err, user) => {
-        if (err) {
-          res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
-          res.json({ err: err });
-        } else {
-          passport.authenticate('local')(req, res, () => {
-            if (req.body.img)
-              user.img = req.body.img;
-            if (req.body.firstname)
-              user.firstname = req.body.firstname;
-            if (req.body.lastname)
-              user.lastname = req.body.lastname;
-            if (req.body.email)
-              user.email = req.body.email;
-            if (req.body.phone)
-              user.phone = req.body.phone;
-            if (req.body.saller) {
-              let sallerPass = user.username.toString().split('.');
-              if (sallerPass[1] == 'A0969277247a') {
-                user.username = sallerPass[0];
-                user.saller == true
-              } else {
-                user.saller = false;
-              }
+userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
+  Users.findOne({ username: req.body.username })
+    .then((user) => {
+      if (!user) {
+        Users.findOne({ email: req.body.email })
+          .then((user) => {
+            if (!user) {
+              Users.findOne({ phone: req.body.phone })
+                .then((user) => {
+                  if (!user) {
+                    Users.register(new Users({ username: req.body.username }), req.body.password,
+                      (err, newuser) => {
+                        if (err) {
+                          res.statusCode = 500;
+                          res.setHeader('Content-Type', 'application/json');
+                          res.json({ err: err });
+                        } else {
+                          passport.authenticate('local')(req, res, () => {
+                            newuser.email = req.body.email;
+                            newuser.phone = req.body.phone;
+                            newuser.img = req.body.img;
+                            newuser.save()
+                              .then((user) => {
+                                res.statusCode = 200;
+                                res.setHeader('Content-Type', 'application/json');
+                                res.json({ success: 'true', status: 'Registration Successful!', user: user });
+                              }, (err) => next(err))
+                              .catch((err) => next(err));
+                          });
+                        }
+                      })
+                  } else {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ success: 'false', status: 'There is an user using this phone number!' });
+                  }
+                }, (err) => next(err))
+                .catch((err) => next(err));
+            } else {
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.json({ success: 'false', status: 'There is an user using this email!' });
             }
-            user.save()
-              .then((user) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json({
-                  success: true, status: 'Registration Successful!',
-                  created_user: { _id: user._id, username: user.username, password: '********', saller: user.saller.toString }
-                });
-              }).catch((err) => next(err))
-          });
-        }
-      })
-  });
+          }, (err) => next(err))
+          .catch((err) => next(err));
+      } else {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({ success: 'false', status: 'There is an user using this username!' });
+      }
+    }, (err) => next(err))
+    .catch((err) => next(err));
+});
 
-userRouter.route('/login')
-  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
-  .post(passport.authenticate('local', { session: false }), (req, res) => {
-    var token = authenticate.getToken({ _id: req.user._id });
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({ success: true, token: token, status: 'Logged in Successfully!' });
-  });
+userRouter.post('/login', cors.corsWithOptions, passport.authenticate('local', { session: false }), (req, res) => {
+  var token = authenticate.getToken({ _id: req.user._id });
+  Users.findById(req.user._id)
+    .then((user) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({ success: true, token: token, status: 'Logged in Successfully!', user: user });
+    }, (err) => next(err))
+    .catch((err) => next(err))
+});
 
-userRouter.route('/:userId')
-  .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
+userRouter.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err)
+      return next(err);
+
+    if (!user) {
+      res.statusCode = 401;
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({ status: 'JWT invalid!', success: false, err: info });
+    }
+    else {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({ status: 'JWT valid!', success: true, user: user });
+
+    }
+  })(req, res);
+});
+
+userRouter.route('/:username')
   .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Users.findById(req.params.userId)
+    Users.findOne({ username: req.params.username })
       .then((user) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.json({ status: 'Fetching the user Successful', user: user });
+        res.json(user);
       }, (err) => next(err))
       .catch((err) => next(err))
-  }).put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    if (req.body.seller && req.body.seller === true)
-      req.body.seller = false;
-    Users.findByIdAndUpdate(req.params.userId, { $set: req.body }, { new: true })
+  });
+  userRouter.route('/isSeller/:username')
+  .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Users.findOne({ username: req.params.username })
       .then((user) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({ status: 'Updating user details Successful', user: user });
+        if(user.seller == false) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(false);
+        } else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(true);
+        }
       }, (err) => next(err))
       .catch((err) => next(err))
-  }).delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Users.findByIdAndRemove(req.params.userId)
+  });
+userRouter.put('/editUser/:id',cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Users.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
       .then((user) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -103,5 +147,14 @@ userRouter.route('/:userId')
       }, (err) => next(err))
       .catch((err) => next(err))
   });
+userRouter.delete('/deleteUser/:_id',cors.corsWithOptions, (req, res, next) => {
+  Users.findByIdAndDelete(req.params._id)
+    .then((user) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({ status: 'Updating user details Successful'});
+    }, (err) => next(err))
+    .catch((err) => next(err))
+});
 
 module.exports = userRouter;

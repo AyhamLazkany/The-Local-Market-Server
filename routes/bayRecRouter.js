@@ -14,14 +14,20 @@ bayRecRouter.route('/')
       BayRecs.findOne({ user: req.user._id })
          .populate('products')
          .then((BayRecs) => {
-            if (BayRecs) {
+            if (!BayRecs) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
-               res.json({ status: 'Fetching BayRecs Successful', BayRecs: BayRecs.products });
+               res.json({ "exists": false });
             } else {
-               var err = new Error('Not Found : You don\'t have a bayRec products');
-               err.status = 404;
-               return next(err);
+               if (BayRecs.products == []) {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": false, "BayRecs": BayRecs.products });
+               } else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.json({ "exists": true, "BayRecs": BayRecs.products });
+               }
             }
          }, (err) => next(err))
          .catch((err) => next(err));
@@ -54,13 +60,13 @@ bayRecRouter.route('/:productId')
                      res.json({ status: 'Fetching bayRec Successful', bayRec: bayRec.products.find(product => product._id = req.params.productId) });
                   }, (err) => next(err));
             } else if (bayRec.products.indexOf(req.params.productId) == -1) {
-               err = new Error('The product with id \'' + req.params.productId + '\' not found');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false, "bayRec": bayRec.products });
             } else {
-               var err = new Error('Not Found : You don\'t have a bayRec product');
-               err.status = 404;
-               return next(err);
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'application/json');
+               res.json({ "exists": false });
             }
          }, (err) => next(err))
          .catch((err) => next(err));

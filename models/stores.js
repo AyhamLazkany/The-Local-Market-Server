@@ -11,15 +11,27 @@ const storeSchema = new Schema({
       required: true
    },
    owner: {
-      type: Schema.Types.ObjectId,
-      ref: 'user'
-   },
-   category: {
       type: String,
       required: true
    },
-   title: {
+   ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+   },
+   type: {
       type: String,
+      required: true
+   },
+   phone: {
+      type: String,
+      required: true
+   },
+   fbsrc: {
+      type: String,
+      required: true
+   },
+   categories: {
+      type: [String],
       required: true
    },
    description: {

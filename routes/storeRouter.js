@@ -11,8 +11,8 @@ storeRouter.use(bodyParser.json());
 /* GET stores listing. */
 storeRouter.route('/')
   .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
-  .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
-    Stores.find({})
+  .get(cors.cors, (req, res, next) => {
+    Stores.find(req.query)
       .then((stores) => {
         res.statusCode = 200;
         res.setHeader('Content-type', 'application/json');
@@ -68,7 +68,7 @@ storeRouter.route('/:storeId')
     Stores.findByIdAndRemove(req.params.storeId)
       .then((store) => {
         Products.deleteMany({ storeId: store._id })
-          .then((delResult) => {
+          .then(() => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/json');
             res.json(store);

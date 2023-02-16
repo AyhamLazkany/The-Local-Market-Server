@@ -14,6 +14,7 @@ var productRouter = require('./routes/productRouter');
 var favoriteRouter = require('./routes/favoriteRouter');
 var bayRecRouter = require('./routes/bayRecRouter');
 var saleRecRouter = require('./routes/saleRecRouter');
+var uploadRouter = require('./routes/uploadRouter');
 
 const mongoose = require('mongoose');
 const connect = mongoose.connect(config.mongoUrl);
@@ -46,6 +47,7 @@ app.use('/products', productRouter);
 app.use('/favorites', favoriteRouter);
 app.use('/bayRecs', bayRecRouter);
 app.use('/saleRecs', saleRecRouter);
+app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

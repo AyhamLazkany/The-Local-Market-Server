@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const commentSchema = new Schema({
+const ratSchema = new Schema({
    author: {
       type: String,
       required: true
-   },
-   comment: {
-      type: String
    },
    rat: {
       type: Number,
@@ -15,18 +12,20 @@ const commentSchema = new Schema({
       min: 1,
       max: 5
    }
-}, {
-   timestamps: true
 });
 
 const productSchema = new Schema({
-   storeId: {
+   store: {
       type: String,
       required: true
    },
+   storeId: {
+      type: Schema.Types.ObjectId,
+      ref: 'store'
+   },
    img: {
       type: String,
-      required: true
+      default: ''
    },
    category: {
       type: String,
@@ -40,8 +39,8 @@ const productSchema = new Schema({
       type: String,
       required: true
    },
-   quantity: {
-      type: Number,
+   color: {
+      type: String,
       required: true
    },
    sizes: {
@@ -53,8 +52,9 @@ const productSchema = new Schema({
       required: true,
       min: 0
    },
-   comments: {
-      type: [commentSchema]
+   rats: {
+      type: [ratSchema],
+      default: []
    }
 }, {
    timestamps: true
