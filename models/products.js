@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ratSchema = new Schema({
-   author: {
-      type: String,
-      required: true
-   },
    rat: {
       type: Number,
       default: 5,

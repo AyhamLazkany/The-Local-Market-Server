@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var SaleRecs = require('../models/saleRecs');
+var Stores = require('../models/stores');
 var authenticate = require('../authenticate');
 var cors = require('./cors');
 
@@ -12,21 +13,21 @@ saleRecRouter.route('/')
    .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
    .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
       SaleRecs.findOne({ user: req.user._id })
-         .populate('products')
+         .populate('carts.products.product')
          .then((SaleRecs) => {
             if (!SaleRecs) {
                res.statusCode = 200;
                res.setHeader('Content-Type', 'application/json');
                res.json({ "exists": false });
             } else {
-               if (SaleRecs.products == []) {
+               if (SaleRecs.carts == []) {
                   res.statusCode = 200;
                   res.setHeader('Content-Type', 'application/json');
-                  res.json({ "exists": false, "SaleRecs": SaleRecs });
+                  res.json({ "exists": false });
                } else {
                   res.statusCode = 200;
                   res.setHeader('Content-Type', 'application/json');
-                  res.json({ "exists": true, "SaleRecs": SaleRecs.products });
+                  res.json({ "exists": true, "SaleRecs": SaleRecs.carts });
                }
             }
          }, (err) => next(err))
@@ -47,33 +48,20 @@ saleRecRouter.route('/')
          .catch((err) => next(err));
    });
 
-saleRecRouter.route('/:productId')
+saleRecRouter.route('/:cartId')
    .options(cors.corsWithOptions, (req, res, next) => { res.sendStatus = 200; })
-   .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
-      SaleRecs.findOne({ user: req.user._id })
-         .then((saleRec) => {
-            if (saleRec && saleRec.products.indexOf(req.params.productId) !== -1) {
-               saleRec.populate('products')
-                  .then((saleRec) => {
-                     res.statusCode = 200;
-                     res.setHeader('Content-type', 'application/json');
-                     res.json({ status: 'Fetching saleRec Successful', saleRec: saleRec.products.find(product => product._id = req.params.productId) });
-                  }, (err) => next(err));
-            } else if (saleRec.products.indexOf(req.params.productId) == -1) {
-               res.statusCode = 200;
-               res.setHeader('Content-Type', 'application/json');
-               res.json({ "exists": false, "saleRec": saleRec.products });
-            } else {
-               res.statusCode = 200;
-               res.setHeader('Content-Type', 'application/json');
-               res.json({ "exists": false });
-            }
-         }, (err) => next(err))
-         .catch((err) => next(err));
+   .get(cors.corsWithOptions, (req, res, next) => {
+      res.statusCode = 404;
+      res.end('Get operation is not supported on \'/SaleRecs\'');
    }).post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-      SaleRecs.findOne({ user: req.user._id })
+      Stores.findById(req.body.storeId)
+      .then((store) => {
+
+      },(err) => next(err))
+      .catch((err) => next(err))
+      SaleRecs.findOne({ user: req.body.userId })
          .then((saleRec) => {
-            if (saleRec && saleRec.products.indexOf(req.params.productId) == -1) {
+            if (saleRec && saleRec.cart.indexOf(req.params.productId) == -1) {
                saleRec.products.push(req.params.productId);
                saleRec.save()
                   .then((saleRec) => {
